@@ -1,0 +1,10 @@
+Basic flow structure
+
+
+User access client
+Client asks username and pwd 
+
+Client connect auth server 
+Auth server issue token 
+Client send this token to resource server 
+Resource server sends the resource to the client 
