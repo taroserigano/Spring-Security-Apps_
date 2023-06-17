@@ -24,16 +24,25 @@ public class RequestValidationBeforeFilter  implements Filter {
             throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+
+        // extract header 
         String header = req.getHeader(AUTHORIZATION);
         if (header != null) {
             header = header.trim();
             if (StringUtils.startsWithIgnoreCase(header, AUTHENTICATION_SCHEME_BASIC)) {
+
+                // extract after 'Basic' 
                 byte[] base64Token = header.substring(6).getBytes(StandardCharsets.UTF_8);
                 byte[] decoded;
+                
                 try {
+                    // decode using decoder 
                     decoded = Base64.getDecoder().decode(base64Token);
                     String token = new String(decoded, credentialsCharset);
+                    
+                    //  extract pwd because token is 'Basic user.email : user.password' 
                     int delim = token.indexOf(":");
+                    //if pwd doesn't exist 
                     if (delim == -1) {
                         throw new BadCredentialsException("Invalid basic authentication token");
                     }
