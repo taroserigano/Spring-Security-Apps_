@@ -25,14 +25,23 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+                // find authentication info from the Context  
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                // if exists, 
         if (null != authentication) {
+            //create the key for JWT 
             SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+            
+            // set issuer and subject 
             String jwt = Jwts.builder().setIssuer("Eazy Bank").setSubject("JWT Token")
+                     // add username and roles 
                     .claim("username", authentication.getName())
                     .claim("authorities", populateAuthorities(authentication.getAuthorities()))
+                     // and others 
                     .setIssuedAt(new Date())
                     .setExpiration(new Date((new Date()).getTime() + 30000000))
+                     // set secret key and turn into object 
                     .signWith(key).compact();
             response.setHeader(SecurityConstants.JWT_HEADER, jwt);
         }
